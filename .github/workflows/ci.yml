@@ -3,21 +3,12 @@ name: CI
 on:
   pull_request:
     types: [opened, synchronize, reopened, labeled]
-    paths-ignore:
-      - "doc/**"
-      - "_config.yml"
+
   push:
     branches:
-      - master
-
-concurrency:
-  group: "${{ github.workflow }}-${{ github.ref_name }}"
-  cancel-in-progress: true
+      - main
 
 jobs:
-  #----------------------------------------------------------------------------
-  # Default versions: Set default version for all dependencies
-  #----------------------------------------------------------------------------
   test_sqlite_cache:
     runs-on: ubuntu-22.04
     name: Test sqlite cache

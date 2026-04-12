@@ -55,4 +55,4 @@ runs:
       uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-sqlite.outputs.cache-primary-key }}
-        path: dependencies/sqlite_build/install
+        path: sqlite_build/install

@@ -6,14 +6,14 @@ runs:
   steps:
 
     - name: Cache sqlite
-      id: cache-sqlite
+      id: cache-primes-restore
       uses: actions/cache/restore@v5
       with:
         path: ${{github.workspace}}/sqlite_build/install
         key: sqlite-action-08be462f7fa9816f881dbb93eacb2e287f319208-${{runner.os}}-1
 
     - name: Checkout common-superbuild and set everything up
-      if: steps.cache-sqlite.outputs.cache-hit != 'true'
+      if: steps.cache-primes-restore.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}
       shell: bash
       run: |
@@ -23,7 +23,7 @@ runs:
         git checkout 08be462f7fa9816f881dbb93eacb2e287f319208
 
     - name: Configure sqlite
-      if: steps.cache-sqlite.outputs.cache-hit != 'true'
+      if: steps.cache-primes-restore.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/sqlite_build
       shell: bash
       run: >
@@ -34,14 +34,14 @@ runs:
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
 
     - name: Build sqlite
-      if: steps.cache-sqlite.outputs.cache-hit != 'true'
+      if: steps.cache-primes-restore.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/sqlite_build
       shell: bash
       run: cmake --build . --parallel 2
 
     - name: Save cache
-      if: steps.cache-sqlite.outputs.cache-hit != 'true'
+      if: steps.cache-primes-restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v5
       with:
-        key: ${{ steps.cache-sqlite.outputs.cache-primary-key }}
+        key: ${{ steps.cache-primes-restore.outputs.cache-primary-key }}
         path: sqlite_build/install

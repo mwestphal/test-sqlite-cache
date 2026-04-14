@@ -12,7 +12,7 @@ jobs:
 
   test_sqlite_cache_workflow:
     runs-on: ubuntu-22.04
-    name: Test sqlite cache
+    name: Test sqlite cache workflow
 
     steps:
     - uses: actions/checkout@v6
@@ -56,10 +56,16 @@ jobs:
 
   test_sqlite_cache_action:
     runs-on: ubuntu-22.04
-    name: Test sqlite cache
+    name: Test sqlite cache action
 
     steps:
-    - uses: actions/checkout@v6
+
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        path: "source"
+        fetch-depth: 1
+        lfs: false
 
     - name: sqlite action
       uses: ./source/.github/actions/sqlite-install-dep

@@ -1,27 +1,46 @@
-name: CI
+name: Caching Primes
 
-on:
-  pull_request:
-    types: [opened, synchronize, reopened, labeled]
-
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
-  test_sqlite_cache:
-    runs-on: ubuntu-22.04
-    name: Test sqlite cache
+  build:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          path: "source"
-          fetch-depth: 1
-          lfs: false
+    - uses: actions/checkout@v6
 
-      - name: sqlite action
-        uses: ./source/.github/actions/sqlite-install-dep
-        with:
-          csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
+    - name: Restore cached Primes
+      id: cache-primes-restore
+      uses: actions/cache/restore@v5
+      with:
+        key: ${{ runner.os }}-primes-0
+        path: sqlite_build/install
+
+    - name: Checkout common-superbuild and set everything up
+      if: steps.cache-primes-restore.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: |
+        mkdir sqlite_build
+        git clone https://gitlab.kitware.com/paraview/common-superbuild.git sqlite_csb
+        cd sqlite_csb
+        git checkout 08be462f7fa9816f881dbb93eacb2e287f319208
+
+    - name: Configure sqlite
+      if: steps.cache-primes-restore.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/sqlite_build
+      shell: bash
+      run: cmake ../sqlite_csb/selftest -DENABLE_sqlite=ON -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build sqlite
+      if: steps.cache-primes-restore.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/sqlite_build
+      shell: bash
+      run: cmake --build . --parallel 2
+
+    - name: Save Primes
+      id: cache-primes-save
+      uses: actions/cache/save@v5
+      with:
+        key: ${{ steps.cache-primes-restore.outputs.cache-primary-key }}
+        path: sqlite_build/install

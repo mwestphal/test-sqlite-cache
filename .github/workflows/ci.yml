@@ -69,3 +69,5 @@ jobs:
 
     - name: sqlite action
       uses: ./source/.github/actions/sqlite-install-dep
+      inputs:
+        csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208

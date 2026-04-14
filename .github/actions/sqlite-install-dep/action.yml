@@ -8,10 +8,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Check required inputs
-      shell: bash
-      run: |
-        [[ "${{ inputs.csb_version }}" ]] || { echo "csb_version input is empty" ; exit 1; }
 
     - name: Cache sqlite
       id: cache-sqlite

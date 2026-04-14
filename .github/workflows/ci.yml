@@ -13,7 +13,7 @@ jobs:
       id: cache-primes-restore
       uses: actions/cache/restore@v5
       with:
-        key: ${{ runner.os }}-primes-0
+        key: sqlite-08be462f7fa9816f881dbb93eacb2e287f319208-${{runner.os}}-1
         path: sqlite_build/install
 
     - name: Checkout common-superbuild and set everything up
@@ -39,6 +39,7 @@ jobs:
       run: cmake --build . --parallel 2
 
     - name: Save Primes
+      if: steps.cache-primes-restore.outputs.cache-hit != 'true'
       id: cache-primes-save
       uses: actions/cache/save@v5
       with:
